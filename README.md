@@ -1,7 +1,7 @@
 # Rest in Peace - API Design
 
 A modern, pragmatic approach to designing REST APIs that prioritize **functionality**, **consistency**, and **ease of
-use** while eliminating unnecessary complexity and edge-case-driven conventions.
+use** while eliminating unnecessary complexity.
 This eliminates 99% of REST API design headaches.
 You may not agree with every guideline and might have a few “WTF” moments, but the goal is to avoid wasting time on
 designing or reinventing APIs and just focus on building them.
@@ -32,8 +32,8 @@ Table of Contents
 
 ## Overview
 
-1. **POST only** - with operations like
-2. **Simple Paths** - Action-based paths `/list` or `/save`, `/modify`, `/delete`.
+1. **POST only** - with operations
+2. **Simple Paths** - operations-based paths `/list` or `/save`, `/modify`, `/delete`.
 3. **Flat Body** - Only `filter`, `data`, and `meta`.
 4. **No HTTP Status Codes** - Use meta for application errors.
 5. **UTC Milliseconds** - Simple, universal time format.
@@ -45,16 +45,17 @@ Table of Contents
 2. Simplicity: The API structure must be flat and easy to parse.
 3. Security: Sensitive information must not be exposed in query or path parameters. Use the request body instead.
 4. Usability: APIs should reduce ambiguity by removing legacy complexity.
+5. **No resource hypertext/links in responses** - Use ID's only as urls can change in while processing in the async
+   world. It also can create issues when it comes to internal and external URLS.
+6. **Authorization** - Use `Bearer` tokens in the `Authorization` header. (oAuth, JWK, etc.)
 
 ---
 
 ## 2 Versioning
 
-### Must
-
 * Version must be a simple number, reflected in the path: `/v1`.
-* Version increases by any breaking change
-* Adding or removing fields in the payload **is not** considered **a breaking change**.
+* Version increases by any breaking change in behaviour or payload structure.
+    * Adding or removing fields in the payload **is not** considered **a breaking change**.
 
 ## 3 Methods
 
@@ -70,10 +71,11 @@ Table of Contents
 * Easier to use and keep consistency
 * There are too many exceptions like GET with bodies is unsupported in many tools, proxies, and gateways. Its unclear
   how server or consumers infrastructure will react
-    * RFC2616 GET no body
-      allowed [HTTP/1.1 spec, section 4.3](https://www.rfc-editor.org/rfc/rfc2616#section-4.3),[HTTP/1.1 spec, section 9.3](https://www.rfc-editor.org/rfc/rfc2616#section-9.3)
-    * RFCs 7230-7237 GET body ALLOWED [HTTP 1.1 2014 Spec](https://www.rfc-editor.org/rfc/rfc7231#page-24)
+    * **RFC2616 GET with body** not
+      allowed [HTTP/1.1 spec, section 4.3](https://www.rfc-editor.org/rfc/rfc2616#section-4.3), [HTTP/1.1 spec, section 9.3](https://www.rfc-editor.org/rfc/rfc2616#section-9.3)
+    * **RFCs 7230-7237 GET with body** allowed [HTTP 1.1 2014 Spec](https://www.rfc-editor.org/rfc/rfc7231#page-24)
 * PATCH makes it hard to track which fields are modified or unset. Many frameworks handle it inconsistently.
+* [...] list goes endless on. There is no reason to follow exceptions depending on methods and moon phases.
 
 ## 4 Path Structure
 
@@ -87,15 +89,16 @@ Table of Contents
 
 ### Optional:
 
-* Use an **ID** in the path only when necessary: `/v1/user/1234/list`.
+* Use an **ID** in the path only when necessary: `/v1/document/1234/pages/list`.
+* It's allowed to use additional custom Operations like `/v1/user/activate` as long as they are self-explanatory.
 
 ### Why:
 
 * Short, easy to read / understand, **consistent**, and **predictable**. Reduces complexity and ambiguity.
 * There is **no big documentation needed** to understand the API.
 * No encoding / decoding needed for the path.
-* Reduces a lot of different URLs e.g. `/v1/user/1234?name="John"` && `/v1/user/1234/child/5678?name="Silver"` ==
-  `/v1/user/list`.
+* Reduces a lot of different URLs e.g. `/v1/user/1234?name="John"` && `/v1/user/1234/eyes?name="Silver"` ==
+  `/v1/user/list`. Filtering is done by the request body. [5 Request Structure](#5-request-structure)
 * **Security** - sensitive information is not exposed in the URL while the body is encrypted by HTTPs.
 * **Interoperability** - Ensures that the API is compatible with a wide range of tools and platforms.
 * **Maintainability** - Simplifies the process of updating and maintaining and designing APIs.
@@ -263,10 +266,3 @@ Too many unknowns & risks:
   or block redirects cause of CORS / preflight policies, or does not even understand what to do when a `307` instead of
   `302` is returned.
 * **Consistency** - All responses have the same structure. Use one API and know them all.
-
-## 9 Basics
-
-* **No resource hypertext/links in responses** - Use ID's only as urls can change in while processing in the async
-  world. It also can create issues when it comes to internal and external URLS.
-* **Authorization** - Use `Bearer` tokens in the `Authorization` header. (oAuth, JWK, etc.)
-
