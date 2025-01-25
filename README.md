@@ -105,12 +105,14 @@ Table of Contents
 
 ## 5 Request Structure
 
-* **Body** Format: **JSON** or **multipart/form-data** for file uploads
+* **Body** Format: **JSON** or **multipart/form-data** for legacy systems
 * **Body** must be **flat** - as possible - no nested objects
 * **Body** is structured in following:
     * `filter` Optional when filtering is needed.
     * `data` Optional e.g. for updating or saving data.
-
+    * `binary64` Optional binary data as base64 encoded string.
+    * `binary64gz` Optional e.g.binary data as base64 gzip encoded string for download.
+* Support for both `binary` types is mandatory
 ### Optional:
 
 * filtering complex objects can be done by aggregating keys like `{ "person.child.name" : "Yuna" }`
@@ -180,6 +182,9 @@ curl -X POST https://api.example.com/v1/file/upload \
         * `total`: optional pagination total records (`1000`)
     * `data` Optional e.g. for returning data.
     * `error` Optional e.g. for returning error.
+    * `binary64` Optional binary data as base64 encoded string.
+    * `binary64gz` Optional e.g.binary data as base64 gzip encoded string for download.
+* Support for both `binary` types is mandatory
 
 ### Optional:
 
