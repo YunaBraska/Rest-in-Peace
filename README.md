@@ -48,6 +48,7 @@ Table of Contents
 5. **No resource hypertext/links in responses** - Use ID's only as urls can change in while processing in the async
    world. It also can create issues when it comes to internal and external URLS.
 6. **Authorization** - Use `Bearer` tokens in the `Authorization` header. (oAuth, JWK, etc.)
+    * keywords like `Bearer`, `jwt`, or `token` in front of the token are optional and not recommended.
 
 ---
 
@@ -113,6 +114,7 @@ Table of Contents
     * `binary64` Optional binary data as base64 encoded string.
     * `binary64gz` Optional e.g.binary data as base64 gzip encoded string for download.
 * Support for both `binary` types is mandatory
+
 ### Optional:
 
 * filtering complex objects can be done by aggregating keys like `{ "person.child.name" : "Yuna" }`
